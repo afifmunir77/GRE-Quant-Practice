@@ -43,6 +43,33 @@ body {
     text-align: center;
 }
 
+.answer-container {
+    margin: 20px 0;
+    text-align: center;
+}
+
+.fraction-box {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    margin: 10px auto;
+}
+
+.fraction-box input {
+    width: 50px;
+    text-align: center;
+    padding: 5px;
+    margin: 5px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+}
+
+.fraction-line {
+    border-bottom: 1px solid black;
+    width: 60px;
+    margin: 5px auto;
+}
+
 .options-container {
     display: flex;
     flex-direction: column;
@@ -54,7 +81,7 @@ body {
     padding: 10px;
     font-size: 16px;
     border: 1px solid #ccc;
-    border-radius: 5px;
+    border-radius: 25px;
     cursor: pointer;
     background-color: #f9f9f9;
     transition: background-color 0.3s;
@@ -74,13 +101,23 @@ body {
     color: white;
 }
 
+.checkbox-option {
+    display: flex;
+    align-items: center;
+    margin: 10px 0;
+}
+
+.checkbox-option input {
+    margin-right: 10px;
+}
+
 .feedback {
     margin: 20px 0;
     font-size: 16px;
     color: #f44336;
 }
 
-.next-btn, .review-btn, .back-btn {
+.next-btn, .review-btn, .back-btn, .submit-btn {
     padding: 10px 20px;
     background-color: #4CAF50;
     color: white;
@@ -90,7 +127,7 @@ body {
     font-size: 16px;
 }
 
-.next-btn:hover, .review-btn:hover, .back-btn:hover {
+.next-btn:hover, .review-btn:hover, .back-btn:hover, .submit-btn:hover {
     background-color: #45a049;
 }
 
@@ -101,4 +138,23 @@ body {
 .review-questions {
     text-align: left;
     margin: 20px 0;
+}
+
+#answer-input {
+    padding: 10px;
+    font-size: 16px;
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    width: 100px;
+    text-align: center;
+}
+
+#answer-input.correct-input {
+    border-color: #4CAF50;
+    background-color: rgba(76, 175, 80, 0.1);
+}
+
+#answer-input.incorrect-input {
+    border-color: #f44336;
+    background-color: rgba(244, 67, 54, 0.1);
 }
