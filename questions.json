@@ -1,0 +1,20 @@
+[
+    {
+        "type": "open-ended",
+        "question": "Mitchell plans to work at a day camp over the summer. Each week, he will be paid according to the following schedule: at the end of the first week, he will receive $1. At the end of each subsequent week, he will receive $1, plus an additional amount equal to the sum of all payments he’s received in previous weeks. How much money will Mitchell be paid in total during the summer, if he works for the entire duration of the 8-week-long camp?",
+        "correctAnswer": "255",
+        "explanation": "Mitchell's payments double each week: Week 1: $1, Week 2: $1 + $1 = $2, Week 3: $1 + $2 + $1 = $4, and so on. This follows the pattern of powers of 2: $1, $2, $4, $8, $16, $32, $64, $128. The total is $255 (sum of 2^0 + 2^1 + ... + 2^7)."
+    },
+    {
+        "type": "open-ended",
+        "question": "A sequence starts with 3, and each subsequent term is the sum of all previous terms plus 3. What is the 5th term of the sequence?",
+        "correctAnswer": "48",
+        "explanation": "The sequence is: 3, 3 + 3 = 6, 6 + 3 + 3 = 12, 12 + 6 + 3 + 3 = 24, 24 + 12 + 6 + 3 + 3 = 48."
+    },
+    {
+        "type": "open-ended",
+        "question": "If a number is doubled every hour, and it starts at 5, what will the number be after 6 hours?",
+        "correctAnswer": "320",
+        "explanation": "The number doubles every hour: 5, 10, 20, 40, 80, 160, 320."
+    }
+]
