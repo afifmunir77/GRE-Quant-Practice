@@ -15,10 +15,11 @@ let incorrectAnswers = 0;
 let timeTaken = 0;
 let stopwatchInterval;
 let incorrectQuestions = [];
+let userSelections = [];
 
 // DOM elements
 const questionText = document.getElementById('question-text');
-const optionsContainer = document.getElementById('options-container');
+const answerContainer = document.getElementById('answer-container');
 const feedback = document.getElementById('feedback');
 const nextBtn = document.getElementById('next-btn');
 const resultsContainer = document.getElementById('results-container');
@@ -42,30 +43,160 @@ function startQuiz() {
 function showQuestion() {
     const question = questions[currentQuestionIndex];
     questionText.innerHTML = question.question;
+    answerContainer.innerHTML = '';
+    feedback.textContent = '';
+    nextBtn.style.display = 'none';
 
-    optionsContainer.innerHTML = '';
+    if (question.type === 'open-ended') {
+        renderOpenEndedQuestion(question);
+    } else if (question.type === 'multiple-choice') {
+        renderMultipleChoiceQuestion(question);
+    } else if (question.type === 'quantitative-comparison') {
+        renderQuantitativeComparisonQuestion(question);
+    } else if (question.type === 'select-multiple') {
+        renderSelectMultipleQuestion(question);
+    }
+}
+
+// Render open-ended question
+function renderOpenEndedQuestion(question) {
+    if (question.fraction) {
+        answerContainer.innerHTML = `
+            <div class="fraction-box">
+                <input type="text" id="numerator" placeholder="Numerator">
+                <div class="fraction-line"></div>
+                <input type="text" id="denominator" placeholder="Denominator">
+            </div>
+            <button class="submit-btn" id="submit-btn">Submit</button>
+        `;
+    } else {
+        answerContainer.innerHTML = `
+            <input type="text" id="answer-input" placeholder="Your Answer">
+            <button class="submit-btn" id="submit-btn">Submit</button>
+        `;
+    }
+
+    document.getElementById('submit-btn').addEventListener('click', () => {
+        submitOpenEndedAnswer(question);
+    });
+}
+
+// Submit open-ended answer
+function submitOpenEndedAnswer(question) {
+    clearInterval(stopwatchInterval);
+    let userAnswer;
+
+    if (question.fraction) {
+        const numerator = document.getElementById('numerator').value.trim();
+        const denominator = document.getElementById('denominator').value.trim();
+        userAnswer = `${numerator}/${denominator}`;
+    } else {
+        userAnswer = document.getElementById('answer-input').value.trim();
+    }
+
+    if (userAnswer === question.correctAnswer) {
+        document.getElementById(question.fraction ? 'numerator' : 'answer-input').className = 'correct-input';
+        correctAnswers++;
+        setTimeout(nextQuestion, 1000);
+    } else {
+        document.getElementById(question.fraction ? 'numerator' : 'answer-input').className = 'incorrect-input';
+        incorrectAnswers++;
+        incorrectQuestions.push({
+            question: question.question,
+            correctAnswer: question.correctAnswer,
+            explanation: question.explanation
+        });
+        feedback.innerHTML = `<strong>Correct Answer:</strong> ${question.correctAnswer}<br><strong>Explanation:</strong> ${question.explanation}`;
+        nextBtn.style.display = 'block';
+    }
+}
+
+// Render multiple-choice question
+function renderMultipleChoiceQuestion(question) {
     question.options.forEach((option, index) => {
         const button = document.createElement('button');
         button.className = 'option-btn';
         button.textContent = option;
         button.onclick = () => selectAnswer(option, question.correctAnswer, question.explanation);
-        optionsContainer.appendChild(button);
+        answerContainer.appendChild(button);
     });
-
-    feedback.textContent = '';
-    nextBtn.style.display = 'none';
 }
 
-// Select an answer
+// Render quantitative comparison question
+function renderQuantitativeComparisonQuestion(question) {
+    const options = [
+        'A. Quantity A is greater',
+        'B. Quantity B is greater',
+        'C. The two quantities are equal',
+        'D. The relationship cannot be determined from the information given'
+    ];
+
+    options.forEach((option, index) => {
+        const button = document.createElement('button');
+        button.className = 'option-btn';
+        button.textContent = option;
+        button.onclick = () => selectAnswer(option[0], question.correctAnswer, question.explanation);
+        answerContainer.appendChild(button);
+    });
+}
+
+// Render select multiple question
+function renderSelectMultipleQuestion(question) {
+    question.options.forEach((option, index) => {
+        const div = document.createElement('div');
+        div.className = 'checkbox-option';
+        div.innerHTML = `
+            <input type="checkbox" id="option-${index}" value="${option[0]}">
+            <label for="option-${index}">${option}</label>
+        `;
+        answerContainer.appendChild(div);
+    });
+
+    const submitBtn = document.createElement('button');
+    submitBtn.className = 'submit-btn';
+    submitBtn.textContent = 'Submit';
+    submitBtn.onclick = () => submitMultipleAnswers(question);
+    answerContainer.appendChild(submitBtn);
+}
+
+// Submit multiple answers
+function submitMultipleAnswers(question) {
+    clearInterval(stopwatchInterval);
+    const selectedOptions = [];
+    question.options.forEach((_, index) => {
+        const checkbox = document.getElementById(`option-${index}`);
+        if (checkbox.checked) {
+            selectedOptions.push(checkbox.value);
+        }
+    });
+
+    const isCorrect = JSON.stringify(selectedOptions.sort()) === JSON.stringify(question.correctAnswer.sort());
+
+    if (isCorrect) {
+        correctAnswers++;
+        setTimeout(nextQuestion, 1000);
+    } else {
+        incorrectAnswers++;
+        incorrectQuestions.push({
+            question: question.question,
+            correctAnswer: question.correctAnswer,
+            explanation: question.explanation
+        });
+        feedback.innerHTML = `<strong>Correct Answer:</strong> ${question.correctAnswer.join(', ')}<br><strong>Explanation:</strong> ${question.explanation}`;
+        nextBtn.style.display = 'block';
+    }
+}
+
+// Select an answer for multiple-choice or quantitative comparison
 function selectAnswer(selectedOption, correctAnswer, explanation) {
     clearInterval(stopwatchInterval);
+    const buttons = answerContainer.querySelectorAll('.option-btn');
 
-    const buttons = optionsContainer.querySelectorAll('.option-btn');
     buttons.forEach(button => {
-        if (button.textContent === selectedOption) {
+        if (button.textContent[0] === selectedOption) {
             button.className = selectedOption === correctAnswer ? 'option-btn correct' : 'option-btn incorrect';
         }
-        if (button.textContent === correctAnswer) {
+        if (button.textContent[0] === correctAnswer) {
             button.className = 'option-btn correct';
         }
         button.disabled = true;
@@ -77,7 +208,7 @@ function selectAnswer(selectedOption, correctAnswer, explanation) {
     } else {
         incorrectAnswers++;
         incorrectQuestions.push({
-            question: questions[currentQuestionIndex].question,
+            question: questionText.textContent,
             correctAnswer,
             explanation
         });
